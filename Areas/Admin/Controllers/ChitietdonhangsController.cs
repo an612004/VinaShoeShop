@@ -12,7 +12,7 @@ namespace VinaShoseShop.Areas.Admin.Controllers
     public class ChitietdonhangsController : Controller
     {
         private ApplicationDbcontext db = new ApplicationDbcontext();
-
+		//Database
 
 		public ActionResult Index(int? page, int? Madon)
 		{
