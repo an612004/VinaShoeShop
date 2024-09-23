@@ -24,11 +24,69 @@ namespace VinaShoseShop.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult dangky(Nguoidung nguoidung)
         {
+            // Kiểm tra họ tên: không được để trống, không được chứa số, không chứa ký tự đặc biệt, và có độ dài tối thiểu 3 ký tự
+            if (string.IsNullOrEmpty(nguoidung.Hoten))
+            {
+                ModelState.AddModelError("Hoten", "Họ tên không được để trống.");
+            }
+            else if (nguoidung.Hoten.Any(char.IsDigit))
+            {
+                ModelState.AddModelError("Hoten", "Họ tên không được chứa số.");
+            }
+            else if (nguoidung.Hoten.Length < 3)
+            {
+                ModelState.AddModelError("Hoten", "Họ tên phải có độ dài tối thiểu 3 ký tự.");
+            }
+            else if (!System.Text.RegularExpressions.Regex.IsMatch(nguoidung.Hoten, @"^[a-zA-Z\s]+$"))
+            {
+                ModelState.AddModelError("Hoten", "Họ tên chỉ được chứa chữ cái và khoảng trắng, không bao gồm ký tự đặc biệt.");
+            }
+
+            // Kiểm tra email: không được để trống và phải đúng định dạng Gmail
+            if (string.IsNullOrEmpty(nguoidung.Email))
+            {
+                ModelState.AddModelError("Email", "Email không được để trống.");
+            }
+            else if (!nguoidung.Email.EndsWith("@gmail.com"))
+            {
+                ModelState.AddModelError("Email", "Email phải đúng định dạng Gmail (@gmail.com).");
+            }
+
+            // Kiểm tra số điện thoại: không được để trống, phải có đúng 10 chữ số
+            if (string.IsNullOrEmpty(nguoidung.Dienthoai))
+            {
+                ModelState.AddModelError("Dienthoai", "Số điện thoại không được để trống.");
+            }
+            else if (nguoidung.Dienthoai.Length != 10 || !nguoidung.Dienthoai.All(char.IsDigit))
+            {
+                ModelState.AddModelError("Dienthoai", "Số điện thoại phải có đúng 10 chữ số và không có ký tự và chữ cái.");
+            }
+            else if (!nguoidung.Dienthoai.StartsWith("0"))
+            {
+                ModelState.AddModelError("Dienthoai", "Số điện thoại phải bắt đầu bằng số 0.");
+            }
+
+
+            // Kiểm tra mật khẩu: không được để trống và phải có ít nhất 5 ký tự
+            if (string.IsNullOrEmpty(nguoidung.Matkhau))
+            {
+                ModelState.AddModelError("Matkhau", "Mật khẩu không được để trống.");
+            }
+            else if (nguoidung.Matkhau.Length < 5)
+            {
+                ModelState.AddModelError("Matkhau", "Mật khẩu phải có ít nhất 5 ký tự.");
+            }
+            if (string.IsNullOrEmpty(nguoidung.Diachi))
+            {
+                ModelState.AddModelError("Diachi", "Địa chỉ không được bỏ trống");
+            }
+
+            // Nếu tất cả các điều kiện đều thỏa mãn, lưu người dùng
             if (ModelState.IsValid)
             {
                 try
                 {
-                    nguoidung.Matkhau = GetMD5(nguoidung.Matkhau);
+                    nguoidung.Matkhau = GetMD5(nguoidung.Matkhau);  // Mã hóa mật khẩu trước khi lưu
                     db.Nguoidungs.Add(nguoidung);
                     db.SaveChanges();
                     return RedirectToAction("Dangnhap");
@@ -38,6 +96,8 @@ namespace VinaShoseShop.Controllers
                     ViewBag.Error = "Đã có lỗi xảy ra: " + ex.Message;
                 }
             }
+
+            // Nếu có lỗi, trả về view cùng với các thông báo lỗi
             return View("Dangky");
         }
 
@@ -56,12 +116,29 @@ namespace VinaShoseShop.Controllers
             {
                 string userMail = userlog["userMail"];
                 string password = userlog["password"];
-                var f_password = GetMD5(password);
+                // Kiểm tra trường email và password không được để trống
+                if (string.IsNullOrEmpty(userMail))
+                {
+                    ModelState.AddModelError("userMail", "Email không được để trống.");
+                }
+                if (string.IsNullOrEmpty(password))
+                {
+                    ModelState.AddModelError("password", "Mật khẩu không được để trống.");
+                }
 
+                // Nếu các điều kiện không thỏa mãn
+                if (!ModelState.IsValid)
+                {
+                    return View(model);
+                }
+                //Mã hóa mật khẩu
+                var f_password = GetMD5(password);
+                //Kiểm tra thông tin đăng nhập
                 var islogin = db.Nguoidungs.SingleOrDefault(x => x.Email.Equals(userMail) && x.Matkhau.Equals(f_password));
                 if (islogin != null)
                 {
                     Session["use"] = islogin;
+                    //Kiểm tra nếu là admin
                     if (userMail == "admin@gmail.com" || userMail == "admin2@gmail.com")
                     {
                         return RedirectToAction("Index", "Admin/Home");
@@ -73,9 +150,9 @@ namespace VinaShoseShop.Controllers
                 }
                 else
                 {
-					ViewBag.Chophep = false;
-					ViewBag.Fail = "Đăng nhập thất bại: Tài khoản và mật khẩu của bạn không chính xác xin vui lòng thử lại!";
-					return View(model);
+                    ViewBag.Chophep = false;
+                    ViewBag.Fail = "Đăng nhập thất bại: Tài khoản và mật khẩu của bạn không chính xác xin vui lòng thử lại!";
+                    return View(model);
                 }
             }
             return View(model);

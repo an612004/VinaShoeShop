@@ -39,7 +39,7 @@ namespace VinaShoseShop.Areas.Admin.Controllers
         // Xoá sản phẩm phương thức GET: Admin/Home/Delete/5
         public ActionResult Cancel(int id)
         {
-            // Lấy thông tin đơn hàng cần hủy
+            // Lấy thông tin của các đơn hàng cần hủy
             var dh = db.Donhangs.Find(id);
             if (dh == null)
             {
