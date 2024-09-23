@@ -188,19 +188,78 @@ namespace VinaShoseShop.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Edit(Nguoidung user)
         {
+            // Kiểm tra họ tên: không được để trống, không chứa số, không chứa ký tự đặc biệt, và có độ dài tối thiểu 3 ký tự
+            if (string.IsNullOrEmpty(user.Hoten))
+            {
+                ModelState.AddModelError("Hoten", "Họ tên không được để trống.");
+            }
+            else if (user.Hoten.Any(char.IsDigit))
+            {
+                ModelState.AddModelError("Hoten", "Họ tên không được chứa số.");
+            }
+            else if (user.Hoten.Length < 3)
+            {
+                ModelState.AddModelError("Hoten", "Họ tên phải có độ dài tối thiểu 3 ký tự.");
+            }
+            else if (!System.Text.RegularExpressions.Regex.IsMatch(user.Hoten, @"^[a-zA-Z\s]+$"))
+            {
+                ModelState.AddModelError("Hoten", "Họ tên chỉ được chứa chữ cái và khoảng trắng, không bao gồm ký tự đặc biệt.");
+            }
+
+            // Kiểm tra email: không được để trống và phải đúng định dạng Gmail
+            if (string.IsNullOrEmpty(user.Email))
+            {
+                ModelState.AddModelError("Email", "Email không được để trống.");
+            }
+            else if (!user.Email.EndsWith("@gmail.com"))
+            {
+                ModelState.AddModelError("Email", "Email phải đúng định dạng Gmail (@gmail.com).");
+            }
+
+            // Kiểm tra số điện thoại: không được để trống, phải có đúng 10 chữ số, không chứa ký tự lạ, và bắt đầu bằng số 0
+            if (string.IsNullOrEmpty(user.Dienthoai))
+            {
+                ModelState.AddModelError("Dienthoai", "Số điện thoại không được để trống.");
+            }
+            else if (user.Dienthoai.Length != 10 || !user.Dienthoai.All(char.IsDigit))
+            {
+                ModelState.AddModelError("Dienthoai", "Số điện thoại phải có đúng 10 chữ số và không có kí tự,dấu,chữ cái .");
+            }
+            else if (!user.Dienthoai.StartsWith("0"))
+            {
+                ModelState.AddModelError("Dienthoai", "Số điện thoại phải bắt đầu bằng số 0.");
+            }
+
+            // Kiểm tra mật khẩu (nếu có chỉnh sửa mật khẩu): không được để trống và phải có ít nhất 5 ký tự
+            if (!string.IsNullOrEmpty(user.Matkhau) && user.Matkhau.Length < 5)
+            {
+                ModelState.AddModelError("Matkhau", "Mật khẩu phải có ít nhất 5 ký tự.");
+            }
+
+            // Kiểm tra địa chỉ: không được để trống
+            if (string.IsNullOrEmpty(user.Diachi))
+            {
+                ModelState.AddModelError("Diachi", "Địa chỉ không được để trống.");
+            }
+
+            // Nếu tất cả các điều kiện đều thỏa mãn, cập nhật thông tin người dùng
             if (ModelState.IsValid)
             {
                 var existingUser = db.Nguoidungs.FirstOrDefault(u => u.Manguoidung == user.Manguoidung);
                 if (existingUser != null)
                 {
                     existingUser.Hoten = user.Hoten;
+                    existingUser.Email = user.Email;
                     existingUser.Dienthoai = user.Dienthoai;
                     existingUser.Diachi = user.Diachi;
+
                     db.SaveChanges();
                     Session["use"] = existingUser;
                     return RedirectToAction("Thongtin");
                 }
             }
+
+            // Nếu có lỗi, trả về view cùng với các thông báo lỗi
             return View(user);
         }
 
