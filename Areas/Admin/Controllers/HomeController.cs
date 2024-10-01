@@ -169,6 +169,8 @@ namespace VinaShoseShop.Areas.Admin.Controllers
                 return View();
             }
         }
+        //Phương thức này dùng để giải phóng tài nguyên (như kết nối cơ sở dữ liệu)
+        //khi đối tượng không còn sử dụng, đảm bảo tránh rò rỉ bộ nhớ.
         protected override void Dispose(bool disposing)
         {
             if (disposing)

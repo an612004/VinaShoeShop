@@ -133,7 +133,7 @@ namespace VinaShoseShop.Controllers
                 }
                 //Mã hóa mật khẩu
                 var f_password = GetMD5(password);
-                //Kiểm tra thông tin đăng nhập
+                //Kiểm tra thông tin đăng nhập/ nếu trùng tài khoản gmail sẽ báo lỗi ở đây
                 var islogin = db.Nguoidungs.SingleOrDefault(x => x.Email.Equals(userMail) && x.Matkhau.Equals(f_password));
                 if (islogin != null)
                 {

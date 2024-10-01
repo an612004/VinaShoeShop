@@ -326,6 +326,7 @@
     <Content Include="HinhanhSP\tin 4.jpg" />
     <Content Include="HinhanhSP\tin 5.jpg" />
     <Content Include="HinhanhSP\tin 6.png" />
+    <Content Include="HinhanhSP\áo thun tay dài 2.jpg" />
     <Content Include="HinhanhSP\ảnh.gif" />
     <Content Include="Scripts\bootstrap.bundle.js" />
     <Content Include="Scripts\bootstrap.bundle.min.js" />
@@ -427,8 +428,6 @@
     <Content Include="Content\bootstrap-grid.min.css.map" />
     <Content Include="Content\bootstrap-grid.css.map" />
     <None Include="packages.config" />
-    <None Include="Properties\PublishProfiles\hobinhan-001-site1 - FTP.pubxml" />
-    <None Include="Properties\PublishProfiles\hobinhan-001-site1 - Web Deploy.pubxml" />
     <Content Include="Scripts\bootstrap.min.js.map" />
     <Content Include="Scripts\bootstrap.js.map" />
     <Content Include="Scripts\bootstrap.esm.min.js.map" />
